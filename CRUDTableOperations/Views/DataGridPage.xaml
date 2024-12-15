@@ -37,15 +37,6 @@
             VerticalAlignment="Bottom"
             >
             <Button 
-                Click="ConnectToDatabaseButton_Click"
-                Grid.Column="1" 
-                HorizontalAlignment="Left"
-                Width="100"
-                Margin="5"
-                x:Name="ConnectToDatabaseButton"
-                Content="Connect"/>
-
-            <Button 
                 Click="SaveButton_Click"
                 Grid.Column="2" 
                 HorizontalAlignment="Right"

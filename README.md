@@ -12,6 +12,7 @@ CREATE TABLE Cars (
 ```
 
 ### Insert values into the cars table
+```
 INSERT INTO Cars (Make, Model, Year, Price) VALUES
 ('Toyota', 'Corolla', 2020, 20000.00),
 ('Honda', 'Civic', 2019, 18000.00),
@@ -23,5 +24,5 @@ INSERT INTO Cars (Make, Model, Year, Price) VALUES
 ('Hyundai', 'Elantra', 2019, 17000.00),
 ('Nissan', 'Altima', 2020, 21000.00),
 ('Volkswagen', 'Jetta', 2021, 24000.00);
-
+```
 

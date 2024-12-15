@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRUDTableOperations", "CRUDTableOperations\CRUDTableOperations.csproj", "{72B0CB4F-20F4-490D-AFD4-6554DC9612DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRUDTableOperations.Core", "CRUDTableOperations.Core\CRUDTableOperations.Core.csproj", "{4B8A4CC4-25FC-4B27-887A-515F616E0E57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72B0CB4F-20F4-490D-AFD4-6554DC9612DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72B0CB4F-20F4-490D-AFD4-6554DC9612DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72B0CB4F-20F4-490D-AFD4-6554DC9612DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72B0CB4F-20F4-490D-AFD4-6554DC9612DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B8A4CC4-25FC-4B27-887A-515F616E0E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B8A4CC4-25FC-4B27-887A-515F616E0E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B8A4CC4-25FC-4B27-887A-515F616E0E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B8A4CC4-25FC-4B27-887A-515F616E0E57}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F121BF70-6486-4E3B-81D8-A67271C7989D}
+	EndGlobalSection
+EndGlobal

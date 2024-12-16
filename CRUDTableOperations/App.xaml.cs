@@ -68,6 +68,7 @@ public partial class App : Application
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<INavigationService, NavigationService>();
 		services.AddSingleton<SQLDataService>();
+        services.AddSingleton<EmployeeSQLDataService>();
 
 		// Views and ViewModels
 		services.AddTransient<IShellWindow, ShellWindow>();

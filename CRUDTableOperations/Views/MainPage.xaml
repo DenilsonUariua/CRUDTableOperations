@@ -13,18 +13,51 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <!-- Page Title -->
         <TextBlock
             Style="{StaticResource PageTitleStyle}"
             Margin="{StaticResource MediumLeftMargin}"
             Text="{x:Static properties:Resources.MainPageTitle}" />
-        <Grid
+
+        <!-- Server and Database Selection -->
+        <StackPanel
             Grid.Row="1"
             Margin="{StaticResource MediumLeftRightMargin}"
-            Background="{DynamicResource MahApps.Brushes.Gray10}">
-            <!--
-            The Mahapps Gray10 color represents where you should place your content.
-            Place your content here.
-            -->
-        </Grid>
+            Background="{DynamicResource MahApps.Brushes.Gray10}"
+            Orientation="Vertical"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center"
+            >
+
+            <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="0,0,0,10" />
+
+            <!-- Server Selection -->
+            <StackPanel Orientation="Horizontal" Margin="0,5">
+                <Label Content="Server:" Width="80" VerticalAlignment="Center" />
+                <ComboBox
+                    x:Name="ServerComboBox"
+                    Width="200"
+                    Margin="5"
+                    SelectionChanged="ServerComboBox_SelectionChanged" />
+            </StackPanel>
+
+            <!-- Database Selection -->
+            <StackPanel Orientation="Horizontal" Margin="0,5">
+                <Label Content="Database:" Width="80" VerticalAlignment="Center" />
+                <ComboBox
+                    x:Name="DatabaseComboBox"
+                    Width="200"
+                    Margin="5" />
+            </StackPanel>
+
+            <!-- Connect Button -->
+            <Button
+                Content="Connect"
+                Width="100"
+                HorizontalAlignment="Center"
+                Margin="0,10"
+                Click="ConnectButton_Click" />
+        </StackPanel>
     </Grid>
 </Page>

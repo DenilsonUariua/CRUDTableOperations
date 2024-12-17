@@ -11,11 +11,19 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="48" />
+        </Grid.ColumnDefinitions>
 
         <!-- Page Title -->
         <TextBlock
+            Grid.Column="1"
             Style="{StaticResource PageTitleStyle}"
             Margin="{StaticResource MediumLeftMargin}"
             Text="{x:Static properties:Resources.MainPageTitle}" />
@@ -23,41 +31,100 @@
         <!-- Server and Database Selection -->
         <StackPanel
             Grid.Row="1"
+            Grid.Column="1"
             Margin="{StaticResource MediumLeftRightMargin}"
             Background="{DynamicResource MahApps.Brushes.Gray10}"
             Orientation="Vertical"
             VerticalAlignment="Top"
-            HorizontalAlignment="Center"
-            >
-
-            <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="0,0,0,10" />
+            HorizontalAlignment="Center">
+            <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="10" />
 
             <!-- Server Selection -->
-            <StackPanel Orientation="Horizontal" Margin="0,5">
+            <StackPanel Orientation="Horizontal" Margin="10">
                 <Label Content="Server:" Width="80" VerticalAlignment="Center" />
-                <ComboBox
-                    x:Name="ServerComboBox"
+                <TextBox
+                    x:Name="ServerTextBox"
                     Width="200"
                     Margin="5"
-                    SelectionChanged="ServerComboBox_SelectionChanged" />
+                    TextChanged="ServerTextBox_TextChanged" />
             </StackPanel>
 
             <!-- Database Selection -->
-            <StackPanel Orientation="Horizontal" Margin="0,5">
+            <StackPanel Orientation="Horizontal" Margin="10">
                 <Label Content="Database:" Width="80" VerticalAlignment="Center" />
                 <ComboBox
                     x:Name="DatabaseComboBox"
+                    Width="200"
+                    SelectionChanged="DatabaseComboBox_SelectionChanged"
+                    Margin="5" />
+            </StackPanel>
+
+            <!--Table Selection-->
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <Label Content="Table:" Width="80" VerticalAlignment="Center" />
+                <ComboBox
+                    x:Name="TableComboBox"
                     Width="200"
                     Margin="5" />
             </StackPanel>
 
             <!-- Connect Button -->
             <Button
+                x:Name="ConnectButton"
                 Content="Connect"
                 Width="100"
                 HorizontalAlignment="Center"
                 Margin="0,10"
                 Click="ConnectButton_Click" />
         </StackPanel>
+
+        <!-- CRUD Buttons -->
+        <StackPanel 
+            Grid.Row="2" 
+            Grid.Column="1" 
+            Orientation="Horizontal" 
+            HorizontalAlignment="Center"
+            Margin="0,10">
+            <Button 
+                x:Name="btnCreate" 
+                Content="Create" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnCreate_Click"/>
+            <Button 
+                x:Name="btnUpdate" 
+                Content="Update" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnUpdate_Click"/>
+            <Button 
+                x:Name="btnDelete" 
+                Content="Delete" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnDelete_Click"/>
+            <Button 
+                x:Name="btnSave" 
+                Content="Save Changes" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnSave_Click"/>
+            <Button 
+                x:Name="btnCancel" 
+                Content="Cancel" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnCancel_Click"/>
+        </StackPanel>
+
+        <!-- DataGrid to display table contents -->
+        <DataGrid
+            Grid.Column="1"
+            Grid.Row="3" 
+            x:Name="DataGridResults" 
+            Margin="10"
+            AutoGenerateColumns="True"
+            CanUserAddRows="False"
+            IsReadOnly="False" />
     </Grid>
 </Page>

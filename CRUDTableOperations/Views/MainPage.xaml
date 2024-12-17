@@ -13,6 +13,7 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -116,11 +117,88 @@
                 Margin="5,0"
                 Click="btnCancel_Click"/>
         </StackPanel>
+        <!-- Filter Controls -->
+        <TextBlock
+            Grid.Row="3"
+            Grid.Column="1"
+            Text="Select Columns to Filter:"
+            FontWeight="Bold"
+            Margin="15,0,0,0"
+            />
+        <StackPanel 
+            Grid.Row="3" 
+            Grid.Column="1" 
+            Orientation="Horizontal"
+            Margin="10">
+            <!-- Filter Row 1 -->
+            <StackPanel 
+                Orientation="Vertical" 
+                Margin="5">
+                <ComboBox 
+                    x:Name="cmbColumn1" 
+                    Width="150" 
+                    HorizontalAlignment="Left"
+                    Margin="0, 5"
+                    IsEnabled="False"
+                    />
+                <TextBox 
+                    x:Name="txtFilter1" 
+                    Width="250" 
+                    IsEnabled="False"
+                    TextChanged="ApplyFilter"
+                    />
+            </StackPanel>
+
+            <!-- Filter Row 2 -->
+            <StackPanel Orientation="Vertical" Margin="5">
+                <ComboBox 
+                    x:Name="cmbColumn2" 
+                    Width="150" 
+                    HorizontalAlignment="Left"
+                    Margin="0, 5"
+                    IsEnabled="False"
+                    />
+                <TextBox 
+                    x:Name="txtFilter2" 
+                    Width="250" 
+                    IsEnabled="False"
+                    TextChanged="ApplyFilter"
+                    />
+            </StackPanel>
+
+            <!-- Filter Row 3 -->
+            <StackPanel Orientation="Vertical" Margin="5">
+                <ComboBox 
+                    x:Name="cmbColumn3" 
+                    Width="150" 
+                    HorizontalAlignment="Left"
+                    Margin="0, 5"
+                    IsEnabled="False"
+                    />
+                <TextBox 
+                    x:Name="txtFilter3" 
+                    Width="250" 
+                    IsEnabled="False"
+                    TextChanged="ApplyFilter"
+                    />
+            </StackPanel>
+
+            <!-- Clear Filter Button -->
+            <Button 
+                x:Name="btnClearFilter"
+                Content="Clear Filter" 
+                Height="30"
+                Width="150"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                Margin="5"
+                Click="btnClearFilter_Click"/>
+        </StackPanel>
 
         <!-- DataGrid to display table contents -->
         <DataGrid
             Grid.Column="1"
-            Grid.Row="3" 
+            Grid.Row="4" 
             x:Name="DataGridResults" 
             Margin="10"
             AutoGenerateColumns="True"

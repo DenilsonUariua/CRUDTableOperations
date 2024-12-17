@@ -155,7 +155,7 @@ namespace CRUDTableOperations.Views
 					btnUpdate.IsEnabled = true;
 					btnDelete.IsEnabled = true;
 				}
-
+				PopulateColumnFilters();
 				// Optional: Show number of rows retrieved
 				MessageBox.Show($"Retrieved {CurrentDataTable.Rows.Count} rows from {CurrentTable}",
 					"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -272,6 +272,110 @@ namespace CRUDTableOperations.Views
 				MessageBox.Show($"Error saving changes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+		private void ApplyFilter(object sender, TextChangedEventArgs e)
+		{
+			if (CurrentDataTable == null) return;
+
+			// Create a view of the data source
+			DataView dataView = new DataView(CurrentDataTable);
+
+			// Build filter string
+			string filterString = BuildFilterString();
+
+			try
+			{
+				// Apply the filter
+				dataView.RowFilter = filterString;
+
+				// Update DataGrid with filtered results
+				DataGridResults.ItemsSource = dataView;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error applying filter: {ex.Message}", "Filter Error",
+					MessageBoxButton.OK, MessageBoxImage.Warning);
+			}
+		}
+
+		// Build filter string from multiple filter text boxes
+		private string BuildFilterString()
+		{
+			// Create an array of filter conditions
+			var filters = new[]
+			{
+				BuildSingleColumnFilter(txtFilter1, cmbColumn1),
+				BuildSingleColumnFilter(txtFilter2, cmbColumn2),
+				BuildSingleColumnFilter(txtFilter3, cmbColumn3)
+			};
+
+			// Remove empty conditions and join with AND
+			var activeFilters = filters.Where(f => !string.IsNullOrWhiteSpace(f));
+			return string.Join(" AND ", activeFilters);
+		}
+
+		// Build filter for a single column
+		private string BuildSingleColumnFilter(TextBox filterTextBox, ComboBox columnComboBox)
+		{
+			// If no text or no column selected, return empty
+			if (string.IsNullOrWhiteSpace(filterTextBox.Text) ||
+				columnComboBox.SelectedItem == null)
+				return string.Empty;
+
+			string columnName = columnComboBox.SelectedItem.ToString();
+			string filterText = filterTextBox.Text.Trim();
+
+			// Determine column type for appropriate filtering
+			DataColumn column = CurrentDataTable.Columns[columnName];
+
+			// Handle different data types
+			if (column.DataType == typeof(string))
+			{
+				// String contains filter (case-insensitive)
+				return $"[{columnName}] LIKE '%{filterText}%'";
+			}
+			else if (column.DataType == typeof(int) ||
+					 column.DataType == typeof(decimal) ||
+					 column.DataType == typeof(double))
+			{
+				// Numeric exact match or range
+				return $"[{columnName}] = {filterText}";
+			}
+			else if (column.DataType == typeof(DateTime))
+			{
+				// Date filtering
+				return $"[{columnName}] = '{filterText}'";
+			}
+
+			// Default to string contains for unknown types
+			return $"[{columnName}] LIKE '%{filterText}%'";
+		}
+
+		// Populate column selection ComboBoxes when table is loaded
+		private void PopulateColumnFilters()
+		{
+			if (CurrentDataTable == null) return;
+
+			// Clear existing items
+			cmbColumn1.Items.Clear();
+			cmbColumn2.Items.Clear();
+			cmbColumn3.Items.Clear();
+
+			// Add column names to ComboBoxes
+			foreach (DataColumn column in CurrentDataTable.Columns)
+			{
+				cmbColumn1.Items.Add(column.ColumnName);
+				cmbColumn2.Items.Add(column.ColumnName);
+				cmbColumn3.Items.Add(column.ColumnName);
+			}
+
+			// Enable filter controls
+			txtFilter1.IsEnabled = true;
+			txtFilter2.IsEnabled = true;
+			txtFilter3.IsEnabled = true;
+			cmbColumn1.IsEnabled = true;
+			cmbColumn2.IsEnabled = true;
+			cmbColumn3.IsEnabled = true;
+		}
 
 		// Cancel changes
 		private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -288,6 +392,24 @@ namespace CRUDTableOperations.Views
 				// Disable save and cancel buttons
 				btnSave.IsEnabled = false;
 				btnCancel.IsEnabled = false;
+			}
+		}
+		private void btnClearFilter_Click(object sender, RoutedEventArgs e)
+		{
+			// Clear filter text boxes
+			txtFilter1.Clear();
+			txtFilter2.Clear();
+			txtFilter3.Clear();
+
+			// Clear column selections
+			cmbColumn1.SelectedItem = null;
+			cmbColumn2.SelectedItem = null;
+			cmbColumn3.SelectedItem = null;
+
+			// Restore original data source
+			if (CurrentDataTable != null)
+			{
+				DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
 			}
 		}
 	}

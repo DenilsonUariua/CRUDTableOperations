@@ -61,12 +61,7 @@
                         <MenuItem Header="{x:Static properties:Resources.ShellMenuFileHeader}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}">
                             <MenuItem Header="{x:Static properties:Resources.ShellMenuItemFileExitHeader}" Command="{Binding MenuFileExitCommand}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}" />
                         </MenuItem>
-                        <MenuItem Header="{x:Static properties:Resources.ShellMenuViewsHeader}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}">
-                            <!--TODO: Review the MenuItem headers in Resources.resx file for all of your views and place '_' before the letter that you want to use for menu keyboard usage-->
-                            <MenuItem Header="{x:Static properties:Resources.ShellMenuItemViewsMainPageHeader}" Command="{Binding MenuViewsMainCommand}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}" />
-                            <MenuItem Header="{x:Static properties:Resources.ShellMenuItemViewsDataGridPageHeader}" Command="{Binding MenuViewsDataGridCommand}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}" />
-                            <MenuItem Header="{x:Static properties:Resources.ShellMenuItemViewsDataGrid1PageHeader}" Command="{Binding MenuViewsDataGrid1Command}" AutomationProperties.Name="{Binding Header, RelativeSource={RelativeSource Self}}" />
-                        </MenuItem>
+                       
                     </Menu>
                     <Frame
                         Grid.Row="1"

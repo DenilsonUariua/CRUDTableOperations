@@ -148,6 +148,6 @@
     <value>_Exit</value>
   </data>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>CRUDTableOperations</value>
+    <value>TDW_TABLE_MANAGER</value>
   </data>
 </root>

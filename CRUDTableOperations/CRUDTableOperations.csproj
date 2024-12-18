@@ -7,7 +7,12 @@
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>logo-1.ico</ApplicationIcon>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Content Include="logo-1.ico" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />

@@ -40,6 +40,60 @@
             HorizontalAlignment="Center">
             <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="10" />
 
+            <!-- Login Section -->
+            <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="{StaticResource MediumLeftRightMargin}"
+            Background="{DynamicResource MahApps.Brushes.Gray10}"
+            Orientation="Vertical"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center">
+                <TextBlock Text="Database Authentication" FontWeight="Bold" Margin="10" />
+
+                <!-- Authentication Method Selection -->
+                <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                    <RadioButton 
+                    x:Name="rdoWindowsAuth" 
+                    Content="Windows Authentication" 
+                    GroupName="AuthMethod" 
+                    Margin="5"
+                    IsChecked="True"
+                    Checked="AuthMethod_Checked"/>
+                    <RadioButton 
+                    x:Name="rdoSqlAuth" 
+                    Content="SQL Server Authentication" 
+                    GroupName="AuthMethod" 
+                    Margin="5"
+                    Checked="AuthMethod_Checked"/>
+                </StackPanel>
+
+                <!-- SQL Authentication Fields -->
+                <StackPanel 
+                x:Name="SqlAuthPanel" 
+                Orientation="Vertical" 
+                Margin="10"
+                Visibility="Collapsed">
+                    <!-- Username -->
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Label Content="Username:" Width="100" VerticalAlignment="Center" />
+                        <TextBox
+                        x:Name="txtUsername"
+                        Width="200"
+                        Margin="5" />
+                    </StackPanel>
+
+                    <!-- Password -->
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Label Content="Password:" Width="100" VerticalAlignment="Center" />
+                        <PasswordBox
+                        x:Name="txtPassword"
+                        Width="200"
+                        Margin="5" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
             <!-- Server Selection -->
             <StackPanel Orientation="Horizontal" Margin="10">
                 <Label Content="Server:" Width="80" VerticalAlignment="Center" />
@@ -119,6 +173,7 @@
         </StackPanel>
         <!-- Filter Controls -->
         <TextBlock
+            x:Name="FilterTextBlock"
             Grid.Row="3"
             Grid.Column="1"
             Text="Select Columns to Filter:"
@@ -126,6 +181,7 @@
             Margin="15,0,0,0"
             />
         <StackPanel 
+            x:Name="FilterPanel"
             Grid.Row="3" 
             Grid.Column="1" 
             Orientation="Horizontal"

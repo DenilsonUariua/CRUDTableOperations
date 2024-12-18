@@ -13,7 +13,7 @@ namespace CRUDTableOperations.Views
 		private string CurrentServer { get; set; }
 		private string CurrentDatabase { get; set; }
 		private string CurrentTable { get; set; }
-
+		private bool _isWindowsAuth = true;
 		// DataTable to track changes
 		private DataTable CurrentDataTable { get; set; }
 
@@ -25,6 +25,27 @@ namespace CRUDTableOperations.Views
 			DatabaseComboBox.IsEnabled = false;
 			TableComboBox.IsEnabled = false;
 			TableComboBox.SelectionChanged += TableComboBox_SelectionChanged;
+			ConnectButton.IsEnabled = false;
+			DataGridResults.Visibility = Visibility.Collapsed;
+			FilterPanel.Visibility = Visibility.Collapsed;
+			FilterTextBlock.Visibility = Visibility.Collapsed;
+		}
+		// Handle authentication method radio button change
+		private void AuthMethod_Checked(object sender, RoutedEventArgs e)
+		{
+			if (rdoWindowsAuth.IsChecked == true)
+			{
+				_isWindowsAuth = true;
+
+				if (SqlAuthPanel == null) return;
+
+				SqlAuthPanel.Visibility = Visibility.Collapsed;
+			}
+			else
+			{
+				_isWindowsAuth = false;
+				SqlAuthPanel.Visibility = Visibility.Visible;
+			}
 		}
 
 		private void InitializeCRUDButtons()
@@ -52,6 +73,23 @@ namespace CRUDTableOperations.Views
 			var server = ServerTextBox.Text;
 			string connectionString = $"Server={server};Integrated Security=True;";
 
+			if (!_isWindowsAuth)
+            {
+				if (string.IsNullOrEmpty(txtUsername.Text)) {
+					MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				if (string.IsNullOrEmpty(txtPassword.Password))
+				{
+					MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				connectionString = $"Server={server};User Id={txtUsername.Text};Password={txtPassword.Password};";
+
+			}
+
 			try
 			{
 				using (var connection = new SqlConnection(connectionString))
@@ -61,7 +99,7 @@ namespace CRUDTableOperations.Views
 
 					// Populate databases
 					DatabaseComboBox.Items.Clear();
-					using (var command = new SqlCommand("SELECT name FROM sys.databases WHERE database_id > 4", connection))
+					using (var command = new SqlCommand("SELECT name FROM sys.databases WHERE database_id > 4 ORDER BY name ASC", connection))
 					{
 						using (var reader = command.ExecuteReader())
 						{
@@ -88,14 +126,37 @@ namespace CRUDTableOperations.Views
 		{
 			if (DatabaseComboBox.SelectedItem == null) return;
 
+			DataGridResults.Visibility = Visibility.Collapsed;
+			FilterPanel.Visibility = Visibility.Collapsed;
+			FilterTextBlock.Visibility = Visibility.Collapsed;
+
+			string connectionString = $"Server={ServerTextBox.Text};Database={DatabaseComboBox.SelectedItem};Integrated Security=True;";
+			if (!_isWindowsAuth)
+			{
+				if (string.IsNullOrEmpty(txtUsername.Text))
+				{
+					MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				if (string.IsNullOrEmpty(txtPassword.Password))
+				{
+					MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				connectionString = $"Server={ServerTextBox.Text};Database={DatabaseComboBox.SelectedItem};User Id={txtUsername.Text};Password={txtPassword.Password};";
+
+			}
+
 			try
 			{
 				// Populate tables
 				TableComboBox.Items.Clear();
-				using (var connection = new SqlConnection($"Server={ServerTextBox.Text};Database={DatabaseComboBox.SelectedItem};Integrated Security=True;"))
+				using (var connection = new SqlConnection(connectionString))
 				{
 					connection.Open();
-					using (var command = new SqlCommand("SELECT name FROM sys.tables", connection))
+					using (var command = new SqlCommand("SELECT name FROM sys.tables ORDER BY name ASC", connection))
 					{
 						using (var reader = command.ExecuteReader())
 						{
@@ -131,7 +192,23 @@ namespace CRUDTableOperations.Views
 
 				// Construct connection string
 				string connectionString = $"Server={CurrentServer};Database={CurrentDatabase};Integrated Security=True;";
+				if (!_isWindowsAuth)
+				{
+					if (string.IsNullOrEmpty(txtUsername.Text))
+					{
+						MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
 
+					if (string.IsNullOrEmpty(txtPassword.Password))
+					{
+						MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+
+					connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
+
+				}
 				// Create DataTable to hold query results
 				CurrentDataTable = new DataTable();
 
@@ -155,7 +232,12 @@ namespace CRUDTableOperations.Views
 					btnUpdate.IsEnabled = true;
 					btnDelete.IsEnabled = true;
 				}
+
 				PopulateColumnFilters();
+				DataGridResults.Visibility = Visibility.Visible;
+				FilterPanel.Visibility = Visibility.Visible;
+				FilterTextBlock.Visibility = Visibility.Visible;
+
 				// Optional: Show number of rows retrieved
 				MessageBox.Show($"Retrieved {CurrentDataTable.Rows.Count} rows from {CurrentTable}",
 					"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -242,6 +324,23 @@ namespace CRUDTableOperations.Views
 			{
 				// Construct connection string
 				string connectionString = $"Server={CurrentServer};Database={CurrentDatabase};Integrated Security=True;";
+				if (!_isWindowsAuth)
+				{
+					if (string.IsNullOrEmpty(txtUsername.Text))
+					{
+						MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+
+					if (string.IsNullOrEmpty(txtPassword.Password))
+					{
+						MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+
+					connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
+
+				}
 
 				using (var connection = new SqlConnection(connectionString))
 				{

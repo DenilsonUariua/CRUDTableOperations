@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using CRUDTableOperations.Helpers;
 using CRUDTableOperations.ViewModels;
 
 namespace CRUDTableOperations.Views
@@ -26,7 +28,7 @@ namespace CRUDTableOperations.Views
 			TableComboBox.IsEnabled = false;
 			TableComboBox.SelectionChanged += TableComboBox_SelectionChanged;
 			ConnectButton.IsEnabled = false;
-			DataGridResults.Visibility = Visibility.Collapsed;
+			//DataGridResults.Visibility = Visibility.Collapsed;
 			FilterPanel.Visibility = Visibility.Collapsed;
 			FilterTextBlock.Visibility = Visibility.Collapsed;
 		}
@@ -56,6 +58,7 @@ namespace CRUDTableOperations.Views
 			btnDelete.IsEnabled = false;
 			btnSave.IsEnabled = false;
 			btnCancel.IsEnabled = false;
+			btnRefresh.IsEnabled = false;
 		}
 
 		public void ServerTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -126,7 +129,7 @@ namespace CRUDTableOperations.Views
 		{
 			if (DatabaseComboBox.SelectedItem == null) return;
 
-			DataGridResults.Visibility = Visibility.Collapsed;
+			//DataGridResults.Visibility = Visibility.Collapsed;
 			FilterPanel.Visibility = Visibility.Collapsed;
 			FilterTextBlock.Visibility = Visibility.Collapsed;
 
@@ -231,10 +234,11 @@ namespace CRUDTableOperations.Views
 					btnCreate.IsEnabled = true;
 					btnUpdate.IsEnabled = true;
 					btnDelete.IsEnabled = true;
+					btnRefresh.IsEnabled = true;
 				}
 
 				PopulateColumnFilters();
-				DataGridResults.Visibility = Visibility.Visible;
+				//DataGridResults.Visibility = Visibility.Visible;
 				FilterPanel.Visibility = Visibility.Visible;
 				FilterTextBlock.Visibility = Visibility.Visible;
 
@@ -331,20 +335,52 @@ namespace CRUDTableOperations.Views
 						MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
 						return;
 					}
-
 					if (string.IsNullOrEmpty(txtPassword.Password))
 					{
 						MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
 						return;
 					}
-
 					connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
-
 				}
 
 				using (var connection = new SqlConnection(connectionString))
 				{
 					connection.Open();
+
+					// Check for existing primary key
+					string keyQuery = @"
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + QUOTENAME(CONSTRAINT_NAME)), 'IsPrimaryKey') = 1
+                AND TABLE_NAME = @TableName";
+
+					string primaryKey = null;
+					using (var keyCommand = new SqlCommand(keyQuery, connection))
+					{
+						keyCommand.Parameters.AddWithValue("@TableName", CurrentTable);
+						using (var reader = keyCommand.ExecuteReader())
+						{
+							if (reader.Read())
+							{
+								primaryKey = reader.GetString(0);
+							}
+						}
+					}
+
+					// If no primary key found, ask user to select one
+					if (primaryKey == null)
+					{
+						var selectionWindow = new ColumnSelectionWindow(CurrentDataTable);
+						if (selectionWindow.ShowDialog() == true)
+						{
+							primaryKey = selectionWindow.SelectedColumn;
+							DefinePrimaryKey(connection, CurrentTable, primaryKey);
+						}
+						else
+						{
+							return; // User cancelled the operation
+						}
+					}
 
 					// Create SqlDataAdapter with the original query
 					string query = $"SELECT * FROM [{CurrentTable}]";
@@ -368,9 +404,36 @@ namespace CRUDTableOperations.Views
 			}
 			catch (Exception ex)
 			{
+				Debug.WriteLine($"Error saving changes: {ex.Message}");
 				MessageBox.Show($"Error saving changes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+
+		private void DefinePrimaryKey(SqlConnection connection, string tableName, string columnName)
+		{
+			try
+			{
+				// Step 1: Ensure the column is non-nullable
+				string alterColumnQuery = $"ALTER TABLE [{tableName}] ALTER COLUMN [{columnName}] INT NOT NULL";
+				using (var alterColumnCommand = new SqlCommand(alterColumnQuery, connection))
+				{
+					alterColumnCommand.ExecuteNonQuery();
+				}
+
+				// Step 2: Add the primary key constraint
+				string addPrimaryKeyQuery = $"ALTER TABLE [{tableName}] ADD CONSTRAINT PK_{tableName} PRIMARY KEY ({columnName})";
+				using (var addPrimaryKeyCommand = new SqlCommand(addPrimaryKeyQuery, connection))
+				{
+					addPrimaryKeyCommand.ExecuteNonQuery();
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"Error defining primary key: {ex.Message}");
+				throw new InvalidOperationException($"Error defining primary key for table '{tableName}': {ex.Message}", ex);
+			}
+		}
+
 		private void ApplyFilter(object sender, TextChangedEventArgs e)
 		{
 			if (CurrentDataTable == null) return;
@@ -476,6 +539,78 @@ namespace CRUDTableOperations.Views
 			cmbColumn3.IsEnabled = true;
 		}
 
+		private void btnRefresh_Click(object sender, RoutedEventArgs e)
+		{
+			if (CurrentTable == null)
+			{
+				MessageBox.Show("Please select a table first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+				return;
+			}
+
+			try
+			{
+				// Construct connection string
+				string connectionString = $"Server={CurrentServer};Database={CurrentDatabase};Integrated Security=True;";
+				if (!_isWindowsAuth)
+				{
+					if (string.IsNullOrEmpty(txtUsername.Text))
+					{
+						MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+
+					if (string.IsNullOrEmpty(txtPassword.Password))
+					{
+						MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+
+					connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
+				}
+
+				// Create new DataTable to hold refreshed data
+				CurrentDataTable = new DataTable();
+
+				// Use SqlDataAdapter to fill the DataTable
+				using (var connection = new SqlConnection(connectionString))
+				{
+					string query = $"SELECT * FROM [{CurrentTable}]";
+					SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+
+					// Create a command builder to help with updates
+					SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
+
+					// Fill the DataTable
+					adapter.Fill(CurrentDataTable);
+
+					// Set the DataGrid's ItemsSource to the refreshed DataTable
+					DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
+
+					// Clear filters
+					txtFilter1.Clear();
+					txtFilter2.Clear();
+					txtFilter3.Clear();
+					cmbColumn1.SelectedItem = null;
+					cmbColumn2.SelectedItem = null;
+					cmbColumn3.SelectedItem = null;
+
+					// Repopulate column filters
+					PopulateColumnFilters();
+
+					// Disable save and cancel buttons as we have fresh data
+					btnSave.IsEnabled = false;
+					btnCancel.IsEnabled = false;
+
+					MessageBox.Show($"Table refreshed successfully. Retrieved {CurrentDataTable.Rows.Count} rows from {CurrentTable}",
+						"Refresh Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+				}
+			}
+
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error refreshing table data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
 		// Cancel changes
 		private void btnCancel_Click(object sender, RoutedEventArgs e)
 		{

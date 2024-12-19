@@ -8,39 +8,30 @@
     xmlns:properties="clr-namespace:CRUDTableOperations.Properties"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="48" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="48" />
-        </Grid.ColumnDefinitions>
+    <!-- Wrap everything in a ScrollViewer to enable scrolling -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Page Title -->
-        <TextBlock
+            <!-- Page Title -->
+            <TextBlock
             Grid.Column="1"
             Style="{StaticResource PageTitleStyle}"
             Margin="{StaticResource MediumLeftMargin}"
             Text="{x:Static properties:Resources.MainPageTitle}" />
 
-        <!-- Server and Database Selection -->
-        <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="{StaticResource MediumLeftRightMargin}"
-            Background="{DynamicResource MahApps.Brushes.Gray10}"
-            Orientation="Vertical"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Center">
-            <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="10" />
-
-            <!-- Login Section -->
+            <!-- Server and Database Selection -->
             <StackPanel
             Grid.Row="1"
             Grid.Column="1"
@@ -49,130 +40,148 @@
             Orientation="Vertical"
             VerticalAlignment="Top"
             HorizontalAlignment="Center">
-                <TextBlock Text="Database Authentication" FontWeight="Bold" Margin="10" />
+                <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="10" />
 
-                <!-- Authentication Method Selection -->
-                <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
-                    <RadioButton 
+                <!-- Login Section -->
+                <StackPanel
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="{StaticResource MediumLeftRightMargin}"
+            Background="{DynamicResource MahApps.Brushes.Gray10}"
+            Orientation="Vertical"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center">
+                    <TextBlock Text="Database Authentication" FontWeight="Bold" Margin="10" />
+
+                    <!-- Authentication Method Selection -->
+                    <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+                        <RadioButton 
                     x:Name="rdoWindowsAuth" 
                     Content="Windows Authentication" 
                     GroupName="AuthMethod" 
                     Margin="5"
                     IsChecked="True"
                     Checked="AuthMethod_Checked"/>
-                    <RadioButton 
+                        <RadioButton 
                     x:Name="rdoSqlAuth" 
                     Content="SQL Server Authentication" 
                     GroupName="AuthMethod" 
                     Margin="5"
                     Checked="AuthMethod_Checked"/>
-                </StackPanel>
+                    </StackPanel>
 
-                <!-- SQL Authentication Fields -->
-                <StackPanel 
+                    <!-- SQL Authentication Fields -->
+                    <StackPanel 
                 x:Name="SqlAuthPanel" 
                 Orientation="Vertical" 
                 Margin="10"
                 Visibility="Collapsed">
-                    <!-- Username -->
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Label Content="Username:" Width="100" VerticalAlignment="Center" />
-                        <TextBox
+                        <!-- Username -->
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <Label Content="Username:" Width="100" VerticalAlignment="Center" />
+                            <TextBox
                         x:Name="txtUsername"
                         Width="200"
                         Margin="5" />
-                    </StackPanel>
+                        </StackPanel>
 
-                    <!-- Password -->
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Label Content="Password:" Width="100" VerticalAlignment="Center" />
-                        <PasswordBox
+                        <!-- Password -->
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <Label Content="Password:" Width="100" VerticalAlignment="Center" />
+                            <PasswordBox
                         x:Name="txtPassword"
                         Width="200"
                         Margin="5" />
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
-            </StackPanel>
 
-            <!-- Server Selection -->
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <Label Content="Server:" Width="80" VerticalAlignment="Center" />
-                <TextBox
+                <!-- Server Selection -->
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Label Content="Server:" Width="80" VerticalAlignment="Center" />
+                    <TextBox
                     x:Name="ServerTextBox"
                     Width="200"
                     Margin="5"
                     TextChanged="ServerTextBox_TextChanged" />
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Database Selection -->
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <Label Content="Database:" Width="80" VerticalAlignment="Center" />
-                <ComboBox
+                <!-- Database Selection -->
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Label Content="Database:" Width="80" VerticalAlignment="Center" />
+                    <ComboBox
                     x:Name="DatabaseComboBox"
                     Width="200"
                     SelectionChanged="DatabaseComboBox_SelectionChanged"
                     Margin="5" />
-            </StackPanel>
+                </StackPanel>
 
-            <!--Table Selection-->
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <Label Content="Table:" Width="80" VerticalAlignment="Center" />
-                <ComboBox
+                <!--Table Selection-->
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Label Content="Table:" Width="80" VerticalAlignment="Center" />
+                    <ComboBox
                     x:Name="TableComboBox"
                     Width="200"
                     Margin="5" />
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Connect Button -->
-            <Button
+                <!-- Connect Button -->
+                <Button
                 x:Name="ConnectButton"
                 Content="Connect"
                 Width="100"
                 HorizontalAlignment="Center"
                 Margin="0,10"
                 Click="ConnectButton_Click" />
-        </StackPanel>
+            </StackPanel>
 
-        <!-- CRUD Buttons -->
-        <StackPanel 
+            <!-- CRUD Buttons -->
+            <StackPanel 
             Grid.Row="2" 
             Grid.Column="1" 
             Orientation="Horizontal" 
             HorizontalAlignment="Center"
             Margin="0,10">
-            <Button 
+                <Button 
                 x:Name="btnCreate" 
                 Content="Create" 
                 Width="100" 
                 Margin="5,0"
                 Click="btnCreate_Click"/>
-            <Button 
+                <Button 
                 x:Name="btnUpdate" 
                 Content="Update" 
                 Width="100" 
                 Margin="5,0"
                 Click="btnUpdate_Click"/>
-            <Button 
+                <Button 
                 x:Name="btnDelete" 
                 Content="Delete" 
                 Width="100" 
                 Margin="5,0"
                 Click="btnDelete_Click"/>
-            <Button 
+                <Button 
                 x:Name="btnSave" 
                 Content="Save Changes" 
                 Width="100" 
                 Margin="5,0"
                 Click="btnSave_Click"/>
-            <Button 
+                <Button 
                 x:Name="btnCancel" 
                 Content="Cancel" 
                 Width="100" 
                 Margin="5,0"
                 Click="btnCancel_Click"/>
-        </StackPanel>
-        <!-- Filter Controls -->
-        <TextBlock
+
+                <Button 
+                x:Name="btnRefresh" 
+                Content="Refresh" 
+                Width="100" 
+                Margin="5,0"
+                Click="btnRefresh_Click"/>
+            </StackPanel>
+            <!-- Filter Controls -->
+            <TextBlock
             x:Name="FilterTextBlock"
             Grid.Row="3"
             Grid.Column="1"
@@ -180,67 +189,67 @@
             FontWeight="Bold"
             Margin="15,0,0,0"
             />
-        <StackPanel 
+            <StackPanel 
             x:Name="FilterPanel"
             Grid.Row="3" 
             Grid.Column="1" 
             Orientation="Horizontal"
             Margin="10">
-            <!-- Filter Row 1 -->
-            <StackPanel 
+                <!-- Filter Row 1 -->
+                <StackPanel 
                 Orientation="Vertical" 
                 Margin="5">
-                <ComboBox 
+                    <ComboBox 
                     x:Name="cmbColumn1" 
                     Width="150" 
                     HorizontalAlignment="Left"
                     Margin="0, 5"
                     IsEnabled="False"
                     />
-                <TextBox 
+                    <TextBox 
                     x:Name="txtFilter1" 
                     Width="250" 
                     IsEnabled="False"
                     TextChanged="ApplyFilter"
                     />
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Filter Row 2 -->
-            <StackPanel Orientation="Vertical" Margin="5">
-                <ComboBox 
+                <!-- Filter Row 2 -->
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <ComboBox 
                     x:Name="cmbColumn2" 
                     Width="150" 
                     HorizontalAlignment="Left"
                     Margin="0, 5"
                     IsEnabled="False"
                     />
-                <TextBox 
+                    <TextBox 
                     x:Name="txtFilter2" 
                     Width="250" 
                     IsEnabled="False"
                     TextChanged="ApplyFilter"
                     />
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Filter Row 3 -->
-            <StackPanel Orientation="Vertical" Margin="5">
-                <ComboBox 
+                <!-- Filter Row 3 -->
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <ComboBox 
                     x:Name="cmbColumn3" 
                     Width="150" 
                     HorizontalAlignment="Left"
                     Margin="0, 5"
                     IsEnabled="False"
                     />
-                <TextBox 
+                    <TextBox 
                     x:Name="txtFilter3" 
                     Width="250" 
                     IsEnabled="False"
                     TextChanged="ApplyFilter"
                     />
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Clear Filter Button -->
-            <Button 
+                <!-- Clear Filter Button -->
+                <Button 
                 x:Name="btnClearFilter"
                 Content="Clear Filter" 
                 Height="30"
@@ -249,10 +258,10 @@
                 HorizontalAlignment="Left"
                 Margin="5"
                 Click="btnClearFilter_Click"/>
-        </StackPanel>
+            </StackPanel>
 
-        <!-- DataGrid to display table contents -->
-        <DataGrid
+            <!-- DataGrid to display table contents -->
+            <DataGrid
             Grid.Column="1"
             Grid.Row="4" 
             x:Name="DataGridResults" 
@@ -260,5 +269,6 @@
             AutoGenerateColumns="True"
             CanUserAddRows="False"
             IsReadOnly="False" />
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Page>

@@ -19,6 +19,11 @@ namespace CRUDTableOperations.Views
 		// DataTable to track changes
 		private DataTable CurrentDataTable { get; set; }
 
+		// Add pagination properties
+		private int CurrentPage { get; set; } = 1;
+		private const int PageSize = 10;
+		private int TotalRecords { get; set; }
+
 		public MainPage(MainViewModel viewModel)
 		{
 			InitializeComponent();
@@ -124,6 +129,47 @@ namespace CRUDTableOperations.Views
 			}
 		}
 
+		private void LoadPagedData()
+		{
+			string connectionString = GetConnectionString();
+			CurrentDataTable = new DataTable();
+
+			using (var connection = new SqlConnection(connectionString))
+			{
+				// First, get total count
+				string countQuery = $"SELECT COUNT(*) FROM [{CurrentTable}]";
+				using (var countCommand = new SqlCommand(countQuery, connection))
+				{
+					connection.Open();
+					TotalRecords = (int)countCommand.ExecuteScalar();
+				}
+
+				// Then get paged data
+				string query = $@"
+                SELECT *
+                FROM (
+                    SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS RowNum
+                    FROM [{CurrentTable}]
+                ) AS Paged
+                WHERE RowNum BETWEEN ({CurrentPage - 1} * {PageSize} + 1) AND ({CurrentPage} * {PageSize})";
+
+				SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+				SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
+				adapter.Fill(CurrentDataTable);
+
+				DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
+
+				// Enable CRUD buttons
+				btnCreate.IsEnabled = true;
+				btnUpdate.IsEnabled = true;
+				btnDelete.IsEnabled = true;
+				btnRefresh.IsEnabled = true;
+
+				// Update status message
+				UpdatePaginationStatus();
+			}
+		}
+
 		// Handle Database ComboBox Selection Changed
 		private void DatabaseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
@@ -181,76 +227,104 @@ namespace CRUDTableOperations.Views
 			}
 		}
 
-		// New method to handle table selection and generate DataGrid
+		// Modify TableComboBox_SelectionChanged method
 		private void TableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (TableComboBox.SelectedItem == null) return;
 
 			try
 			{
-				// Store current selections
 				CurrentServer = ServerTextBox.Text;
 				CurrentDatabase = DatabaseComboBox.SelectedItem.ToString();
 				CurrentTable = TableComboBox.SelectedItem.ToString();
+				CurrentPage = 1; // Reset to first page when table changes
 
-				// Construct connection string
-				string connectionString = $"Server={CurrentServer};Database={CurrentDatabase};Integrated Security=True;";
-				if (!_isWindowsAuth)
-				{
-					if (string.IsNullOrEmpty(txtUsername.Text))
-					{
-						MessageBox.Show($"Please enter a user name", "User name missing", MessageBoxButton.OK, MessageBoxImage.Error);
-						return;
-					}
-
-					if (string.IsNullOrEmpty(txtPassword.Password))
-					{
-						MessageBox.Show($"Please enter a password", "Password Missing", MessageBoxButton.OK, MessageBoxImage.Error);
-						return;
-					}
-
-					connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
-
-				}
-				// Create DataTable to hold query results
-				CurrentDataTable = new DataTable();
-
-				// Use SqlDataAdapter to fill the DataTable
-				using (var connection = new SqlConnection(connectionString))
-				{
-					string query = $"SELECT * FROM [{CurrentTable}]";
-					SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-
-					// Create a command builder to help with updates
-					SqlCommandBuilder builder = new SqlCommandBuilder(adapter);
-
-					// Fill the DataTable
-					adapter.Fill(CurrentDataTable);
-
-					// Set the DataGrid's ItemsSource to the DataTable
-					DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
-
-					// Enable CRUD buttons
-					btnCreate.IsEnabled = true;
-					btnUpdate.IsEnabled = true;
-					btnDelete.IsEnabled = true;
-					btnRefresh.IsEnabled = true;
-				}
+				LoadPagedData();
 
 				PopulateColumnFilters();
-				//DataGridResults.Visibility = Visibility.Visible;
 				FilterPanel.Visibility = Visibility.Visible;
 				FilterTextBlock.Visibility = Visibility.Visible;
-
-				// Optional: Show number of rows retrieved
-				MessageBox.Show($"Retrieved {CurrentDataTable.Rows.Count} rows from {CurrentTable}",
-					"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Error retrieving table data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
+
+
+		// Add method to get connection string
+		private string GetConnectionString()
+		{
+			string connectionString = $"Server={CurrentServer};Database={CurrentDatabase};Integrated Security=True;";
+			if (!_isWindowsAuth)
+			{
+				if (string.IsNullOrEmpty(txtUsername.Text) || string.IsNullOrEmpty(txtPassword.Password))
+				{
+					throw new InvalidOperationException("Username and password are required for SQL Server authentication.");
+				}
+				connectionString = $"Server={CurrentServer};Database={CurrentDatabase};User Id={txtUsername.Text};Password={txtPassword.Password};";
+			}
+			return connectionString;
+		}
+
+		// Add method to update pagination status
+		private void UpdatePaginationStatus()
+		{
+			int totalPages = (int)Math.Ceiling((double)TotalRecords / PageSize);
+			MessageBox.Show($"Showing page {CurrentPage} of {totalPages} (Total records: {TotalRecords})",
+				"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		// Add navigation methods
+		private void btnNextPage_Click(object sender, RoutedEventArgs e)
+		{
+			int totalPages = (int)Math.Ceiling((double)TotalRecords / PageSize);
+			if (CurrentPage < totalPages)
+			{
+				CurrentPage++;
+				LoadPagedData();
+			}
+		}
+
+		private void btnPreviousPage_Click(object sender, RoutedEventArgs e)
+		{
+			if (CurrentPage > 1)
+			{
+				CurrentPage--;
+				LoadPagedData();
+			}
+		}
+
+		//// Modify the refresh method
+		//private void btnRefresh_Click(object sender, RoutedEventArgs e)
+		//{
+		//	if (CurrentTable == null)
+		//	{
+		//		MessageBox.Show("Please select a table first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+		//		return;
+		//	}
+
+		//	try
+		//	{
+		//		LoadPagedData();
+
+		//		// Clear filters
+		//		txtFilter1.Clear();
+		//		txtFilter2.Clear();
+		//		txtFilter3.Clear();
+		//		cmbColumn1.SelectedItem = null;
+		//		cmbColumn2.SelectedItem = null;
+		//		cmbColumn3.SelectedItem = null;
+
+		//		PopulateColumnFilters();
+		//		btnSave.IsEnabled = false;
+		//		btnCancel.IsEnabled = false;
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show($"Error refreshing table data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+		//	}
+		//}
 
 		// Create new row
 		private void btnCreate_Click(object sender, RoutedEventArgs e)
@@ -438,24 +512,178 @@ namespace CRUDTableOperations.Views
 		{
 			if (CurrentDataTable == null) return;
 
-			// Create a view of the data source
-			DataView dataView = new DataView(CurrentDataTable);
-
-			// Build filter string
-			string filterString = BuildFilterString();
-
 			try
 			{
-				// Apply the filter
-				dataView.RowFilter = filterString;
-
-				// Update DataGrid with filtered results
-				DataGridResults.ItemsSource = dataView;
+				// Reset to first page when applying new filters
+				CurrentPage = 1;
+				LoadFilteredData();
 			}
 			catch (Exception ex)
 			{
+				Debug.WriteLine($"Error applying filter: {ex}");
 				MessageBox.Show($"Error applying filter: {ex.Message}", "Filter Error",
 					MessageBoxButton.OK, MessageBoxImage.Warning);
+			}
+		}
+
+		public static SqlParameter CloneSqlParameter(SqlParameter parameter)
+		{
+			return new SqlParameter
+			{
+				ParameterName = parameter.ParameterName,
+				SqlDbType = parameter.SqlDbType,
+				Direction = parameter.Direction,
+				IsNullable = parameter.IsNullable,
+				Size = parameter.Size,
+				Precision = parameter.Precision,
+				Scale = parameter.Scale,
+				SourceColumn = parameter.SourceColumn,
+				SourceVersion = parameter.SourceVersion,
+				Value = parameter.Value
+			};
+		}
+
+
+		private void LoadFilteredData()
+		{
+			string connectionString = GetConnectionString();
+			CurrentDataTable = new DataTable();
+
+			using (var connection = new SqlConnection(connectionString))
+			{
+				connection.Open();
+
+				// Get filter conditions and parameters
+				var (whereClause, parameters) = BuildDatabaseFilterString();
+
+				// Get total filtered count
+				string countQuery = $"SELECT COUNT(*) FROM [{CurrentTable}]";
+				if (!string.IsNullOrWhiteSpace(whereClause))
+				{
+					countQuery += $" WHERE {whereClause}";
+				}
+
+				using (var countCommand = new SqlCommand(countQuery, connection))
+				{
+					// Add parameters to count command
+					foreach (SqlParameter parameter in parameters)
+					{
+						var clonedParameter = CloneSqlParameter(parameter);
+						countCommand.Parameters.Add(clonedParameter);
+					}
+					TotalRecords = (int)countCommand.ExecuteScalar();
+				}
+
+				// Then get paged data with filters
+				string query = $@"
+            SELECT *
+            FROM (
+                SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS RowNum
+                FROM [{CurrentTable}]
+                {(string.IsNullOrWhiteSpace(whereClause) ? "" : $"WHERE {whereClause}")}
+            ) AS Paged
+            WHERE RowNum BETWEEN ({CurrentPage - 1} * {PageSize} + 1) AND ({CurrentPage} * {PageSize})";
+
+				using (var command = new SqlCommand(query, connection))
+				{
+					// Add parameters to main query command
+					foreach (SqlParameter parameter in parameters)
+					{
+						var clonedParameter = CloneSqlParameter(parameter);
+						command.Parameters.Add(clonedParameter);
+					}
+
+					SqlDataAdapter adapter = new SqlDataAdapter(command);
+					adapter.Fill(CurrentDataTable);
+				}
+
+				DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
+				UpdatePaginationStatus();
+			}
+		}
+
+		private (string whereClause, List<SqlParameter> parameters) BuildDatabaseFilterString()
+		{
+			var filterConditions = new List<string>();
+			var parameters = new List<SqlParameter>();
+
+			AddFilterCondition(filterConditions, parameters, txtFilter1, cmbColumn1);
+			AddFilterCondition(filterConditions, parameters, txtFilter2, cmbColumn2);
+			AddFilterCondition(filterConditions, parameters, txtFilter3, cmbColumn3);
+
+			string whereClause = string.Join(" AND ", filterConditions.Where(f => !string.IsNullOrWhiteSpace(f)));
+			return (whereClause, parameters);
+		}
+
+		private void AddFilterCondition(List<string> conditions, List<SqlParameter> parameters, TextBox filterTextBox, ComboBox columnComboBox)
+		{
+			if (string.IsNullOrWhiteSpace(filterTextBox.Text) || columnComboBox.SelectedItem == null)
+				return;
+
+			string columnName = columnComboBox.SelectedItem.ToString();
+			string filterText = filterTextBox.Text.Trim();
+			string paramName = $"@param_{parameters.Count}";
+
+			// Get column type from schema
+			string connectionString = GetConnectionString();
+			using (var connection = new SqlConnection(connectionString))
+			{
+				connection.Open();
+				using (var command = new SqlCommand($"SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @TableName AND COLUMN_NAME = @ColumnName", connection))
+				{
+					command.Parameters.AddWithValue("@TableName", CurrentTable);
+					command.Parameters.AddWithValue("@ColumnName", columnName);
+					string dataType = (string)command.ExecuteScalar();
+
+					switch (dataType.ToLower())
+					{
+						case "nvarchar":
+						case "varchar":
+						case "char":
+						case "nchar":
+						case "text":
+						case "ntext":
+							conditions.Add($"[{columnName}] LIKE '%' + {paramName} + '%'");
+							parameters.Add(new SqlParameter(paramName, filterText));
+							break;
+
+						case "int":
+						case "bigint":
+						case "smallint":
+						case "tinyint":
+							if (int.TryParse(filterText, out int intValue))
+							{
+								conditions.Add($"[{columnName}] = {paramName}");
+								parameters.Add(new SqlParameter(paramName, intValue));
+							}
+							break;
+
+						case "decimal":
+						case "numeric":
+						case "float":
+						case "real":
+							if (decimal.TryParse(filterText, out decimal decimalValue))
+							{
+								conditions.Add($"[{columnName}] = {paramName}");
+								parameters.Add(new SqlParameter(paramName, decimalValue));
+							}
+							break;
+
+						case "datetime":
+						case "date":
+							if (DateTime.TryParse(filterText, out DateTime dateValue))
+							{
+								conditions.Add($"[{columnName}] = {paramName}");
+								parameters.Add(new SqlParameter(paramName, dateValue));
+							}
+							break;
+
+						default:
+							conditions.Add($"CONVERT(NVARCHAR(MAX), [{columnName}]) LIKE '%' + {paramName} + '%'");
+							parameters.Add(new SqlParameter(paramName, filterText));
+							break;
+					}
+				}
 			}
 		}
 
@@ -628,6 +856,7 @@ namespace CRUDTableOperations.Views
 				btnCancel.IsEnabled = false;
 			}
 		}
+		// Update the clear filter method to reload unfiltered data
 		private void btnClearFilter_Click(object sender, RoutedEventArgs e)
 		{
 			// Clear filter text boxes
@@ -640,11 +869,9 @@ namespace CRUDTableOperations.Views
 			cmbColumn2.SelectedItem = null;
 			cmbColumn3.SelectedItem = null;
 
-			// Restore original data source
-			if (CurrentDataTable != null)
-			{
-				DataGridResults.ItemsSource = CurrentDataTable.DefaultView;
-			}
+			// Reset page and reload data
+			CurrentPage = 1;
+			LoadPagedData();
 		}
 	}
 }

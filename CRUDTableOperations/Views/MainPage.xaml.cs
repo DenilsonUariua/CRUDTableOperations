@@ -21,7 +21,7 @@ namespace CRUDTableOperations.Views
 
 		// Add pagination properties
 		private int CurrentPage { get; set; } = 1;
-		private const int PageSize = 10;
+		private const int PageSize = 15;
 		private int TotalRecords { get; set; }
 
 		public MainPage(MainViewModel viewModel)
@@ -129,7 +129,7 @@ namespace CRUDTableOperations.Views
 			}
 		}
 
-		private void LoadPagedData()
+		private void LoadPagedData( bool showMessage = false)
 		{
 			string connectionString = GetConnectionString();
 			CurrentDataTable = new DataTable();
@@ -166,7 +166,7 @@ namespace CRUDTableOperations.Views
 				btnRefresh.IsEnabled = true;
 
 				// Update status message
-				UpdatePaginationStatus();
+				UpdatePaginationStatus(showMessage);
 			}
 		}
 
@@ -239,7 +239,7 @@ namespace CRUDTableOperations.Views
 				CurrentTable = TableComboBox.SelectedItem.ToString();
 				CurrentPage = 1; // Reset to first page when table changes
 
-				LoadPagedData();
+				LoadPagedData(true);
 
 				PopulateColumnFilters();
 				FilterPanel.Visibility = Visibility.Visible;
@@ -268,11 +268,14 @@ namespace CRUDTableOperations.Views
 		}
 
 		// Add method to update pagination status
-		private void UpdatePaginationStatus()
+		private void UpdatePaginationStatus(bool showMessage = false)
 		{
 			int totalPages = (int)Math.Ceiling((double)TotalRecords / PageSize);
-			MessageBox.Show($"Showing page {CurrentPage} of {totalPages} (Total records: {TotalRecords})",
-				"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+			if (showMessage)
+			{
+				MessageBox.Show($"Showing page {CurrentPage} of {totalPages} (Total records: {TotalRecords})",
+					"Data Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
 		}
 
 		// Add navigation methods

@@ -22,6 +22,7 @@
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
 
             <!-- Page Title -->
@@ -259,7 +260,24 @@
                 Margin="5"
                 Click="btnClearFilter_Click"/>
             </StackPanel>
-
+            <StackPanel 
+                Grid.Row="4" 
+                Grid.Column="2"
+                Orientation="Horizontal"
+                VerticalAlignment="Top"
+                >
+                <Button 
+                    Content="&#11164;"
+                    Click="btnPreviousPage_Click"
+                    Margin="2,0"
+                    />
+                <Button 
+                    Content="&#x2B9E;"
+                    Margin="2,0"
+                    Click="btnNextPage_Click"
+                    />
+                    <TextBlock Text=" "/>
+            </StackPanel>
             <!-- DataGrid to display table contents -->
             <DataGrid
             Grid.Column="1"

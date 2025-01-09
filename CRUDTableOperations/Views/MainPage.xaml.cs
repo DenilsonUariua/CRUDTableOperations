@@ -298,57 +298,35 @@ namespace CRUDTableOperations.Views
 			}
 		}
 
-		//// Modify the refresh method
-		//private void btnRefresh_Click(object sender, RoutedEventArgs e)
-		//{
-		//	if (CurrentTable == null)
-		//	{
-		//		MessageBox.Show("Please select a table first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-		//		return;
-		//	}
-
-		//	try
-		//	{
-		//		LoadPagedData();
-
-		//		// Clear filters
-		//		txtFilter1.Clear();
-		//		txtFilter2.Clear();
-		//		txtFilter3.Clear();
-		//		cmbColumn1.SelectedItem = null;
-		//		cmbColumn2.SelectedItem = null;
-		//		cmbColumn3.SelectedItem = null;
-
-		//		PopulateColumnFilters();
-		//		btnSave.IsEnabled = false;
-		//		btnCancel.IsEnabled = false;
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		MessageBox.Show($"Error refreshing table data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-		//	}
-		//}
-
 		// Create new row
 		private void btnCreate_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentDataTable == null)
 			{
-				MessageBox.Show("Please select a table first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+				MessageBox.Show("Please select a table first.", "Warning",
+					MessageBoxButton.OK, MessageBoxImage.Warning);
 				return;
 			}
 
-			// Add a new row to the DataTable
-			DataRow newRow = CurrentDataTable.NewRow();
-			CurrentDataTable.Rows.Add(newRow);
+			var formWindow = new RecordFormWindow(CurrentDataTable)
+			{
+				Owner = Window.GetWindow(this)
+			};
 
-			// Scroll to the new row
-			DataGridResults.ScrollIntoView(newRow);
-			DataGridResults.SelectedItem = newRow;
-
-			// Enable save and cancel buttons
-			btnSave.IsEnabled = true;
-			btnCancel.IsEnabled = true;
+			if (formWindow.ShowDialog() == true)
+			{
+				try
+				{
+					CurrentDataTable.Rows.Add(formWindow.NewRow);
+					btnSave.IsEnabled = true;
+					btnCancel.IsEnabled = true;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show($"Error adding new record: {ex.Message}",
+						"Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+			}
 		}
 
 		// Update existing row

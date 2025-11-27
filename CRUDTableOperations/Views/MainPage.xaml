@@ -7,286 +7,188 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:properties="clr-namespace:CRUDTableOperations.Properties"
     mc:Ignorable="d"
-    d:DesignHeight="450" d:DesignWidth="800">
-    <!-- Wrap everything in a ScrollViewer to enable scrolling -->
+    d:DesignHeight="600" d:DesignWidth="1024">
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
+        <Grid Margin="20,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="48" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="48" />
-                <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
 
-            <!-- Page Title -->
-            <TextBlock
-            Grid.Column="1"
-            Style="{StaticResource PageTitleStyle}"
-            Margin="{StaticResource MediumLeftMargin}"
-            Text="{x:Static properties:Resources.MainPageTitle}" />
+            <!-- Server and Database Selection Card -->
+            <Border 
+                Grid.Row="1"
+                Margin="0,0,0,15"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource MahApps.Brushes.Gray3}"
+                Background="{DynamicResource MahApps.Brushes.Gray10}"
+                Effect="{DynamicResource MahApps.DropShadowEffect}">
 
-            <!-- Server and Database Selection -->
-            <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="{StaticResource MediumLeftRightMargin}"
-            Background="{DynamicResource MahApps.Brushes.Gray10}"
-            Orientation="Vertical"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Center">
-                <TextBlock Text="Select Server and Database" FontWeight="Bold" Margin="10" />
+                <Grid Margin="15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <!-- Login Section -->
-                <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="{StaticResource MediumLeftRightMargin}"
-            Background="{DynamicResource MahApps.Brushes.Gray10}"
-            Orientation="Vertical"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Center">
-                    <TextBlock Text="Database Authentication" FontWeight="Bold" Margin="10" />
+                    <!-- Section Title -->
+                    <TextBlock 
+                        Grid.Row="0"
+                        Text="DATABASE CONNECTION" 
+                        FontSize="18" 
+                        FontWeight="Bold" 
+                        Margin="0,0,0,15" 
+                        Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
 
-                    <!-- Authentication Method Selection -->
-                    <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
-                        <RadioButton 
-                    x:Name="rdoWindowsAuth" 
-                    Content="Windows Authentication" 
-                    GroupName="AuthMethod" 
-                    Margin="5"
-                    IsChecked="True"
-                    Checked="AuthMethod_Checked"/>
-                        <RadioButton 
-                    x:Name="rdoSqlAuth" 
-                    Content="SQL Server Authentication" 
-                    GroupName="AuthMethod" 
-                    Margin="5"
-                    Checked="AuthMethod_Checked"/>
-                    </StackPanel>
+                    <!-- Connection Settings -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- SQL Authentication Fields -->
-                    <StackPanel 
-                x:Name="SqlAuthPanel" 
-                Orientation="Vertical" 
-                Margin="10"
-                Visibility="Collapsed">
-                        <!-- Username -->
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <Label Content="Username:" Width="100" VerticalAlignment="Center" />
+                        <!-- Server & Database & Table Selection -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <!-- Server Selection -->
+                            <TextBlock 
+                                Text="Server" 
+                                FontWeight="Medium" 
+                                Margin="0,0,0,5"/>
                             <TextBox
-                        x:Name="txtUsername"
-                        Width="200"
-                        Margin="5" />
+                                x:Name="ServerTextBox"
+                                Height="32"
+                                Padding="8,0"
+                                VerticalContentAlignment="Center"
+                                Margin="0,0,0,15"
+                                TextChanged="ServerTextBox_TextChanged" />
+
+                            <!-- Database Selection -->
+                            <TextBlock 
+                                Text="Database" 
+                                FontWeight="Medium" 
+                                Margin="0,0,0,5"/>
+                            <ComboBox
+                                x:Name="DatabaseComboBox"
+                                Height="32"
+                                Padding="8,0"
+                                VerticalContentAlignment="Center"
+                                Margin="0,0,0,15"
+                                SelectionChanged="DatabaseComboBox_SelectionChanged" />
+
+                            <!-- Table Selection - Opens New Window -->
+                            <TextBlock 
+                                Text="Select Table to Open" 
+                                FontWeight="Medium" 
+                                Margin="0,0,0,5"/>
+                            <ComboBox
+                                x:Name="TableComboBox"
+                                Height="32"
+                                Padding="8,0"
+                                VerticalContentAlignment="Center" />
                         </StackPanel>
 
-                        <!-- Password -->
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <Label Content="Password:" Width="100" VerticalAlignment="Center" />
-                            <PasswordBox
-                        x:Name="txtPassword"
-                        Width="200"
-                        Margin="5" />
+                        <!-- Authentication Settings -->
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <TextBlock 
+                                Text="Authentication" 
+                                FontWeight="Medium" 
+                                Margin="0,0,0,10"/>
+
+                            <!-- Authentication Method Selection -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <RadioButton 
+                                    x:Name="rdoWindowsAuth" 
+                                    Content="Windows Authentication" 
+                                    GroupName="AuthMethod" 
+                                    Margin="0,0,15,0"
+                                    IsChecked="True"
+                                    Checked="AuthMethod_Checked"/>
+                                <RadioButton 
+                                    x:Name="rdoSqlAuth" 
+                                    Content="SQL Server Authentication" 
+                                    GroupName="AuthMethod" 
+                                    Checked="AuthMethod_Checked"/>
+                            </StackPanel>
+
+                            <!-- SQL Authentication Fields -->
+                            <StackPanel 
+                                x:Name="SqlAuthPanel" 
+                                Visibility="Collapsed"
+                                Margin="0,0,0,10">
+
+                                <!-- Username -->
+                                <TextBlock 
+                                    Text="Username" 
+                                    FontWeight="Medium" 
+                                    Margin="0,0,0,5"/>
+                                <TextBox
+                                    x:Name="txtUsername"
+                                    Height="32"
+                                    Padding="8,0"
+                                    VerticalContentAlignment="Center"
+                                    Margin="0,0,0,10" />
+
+                                <!-- Password -->
+                                <TextBlock 
+                                    Text="Password" 
+                                    FontWeight="Medium" 
+                                    Margin="0,0,0,5"/>
+                                <PasswordBox
+                                    x:Name="txtPassword"
+                                    Height="32"
+                                    Padding="8,0"
+                                    VerticalContentAlignment="Center" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </StackPanel>
+                    </Grid>
 
-                <!-- Server Selection -->
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Label Content="Server:" Width="80" VerticalAlignment="Center" />
-                    <TextBox
-                    x:Name="ServerTextBox"
-                    Width="200"
-                    Margin="5"
-                    TextChanged="ServerTextBox_TextChanged" />
-                </StackPanel>
+                    <!-- Connect/Disconnect Button with Status -->
+                    <Grid Grid.Row="2" Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                <!-- Database Selection -->
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Label Content="Database:" Width="80" VerticalAlignment="Center" />
-                    <ComboBox
-                    x:Name="DatabaseComboBox"
-                    Width="200"
-                    SelectionChanged="DatabaseComboBox_SelectionChanged"
-                    Margin="5" />
-                </StackPanel>
+                        <!-- Connection Status Badge -->
+                        <StackPanel 
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
+                            <Ellipse 
+                                x:Name="ConnectionStatusBadge"
+                                Width="16" 
+                                Height="16" 
+                                Fill="Red"
+                                Margin="0,0,8,0"/>
+                            <TextBlock 
+                                x:Name="ConnectionStatusText"
+                                Text="Disconnected" 
+                                FontWeight="SemiBold"
+                                Foreground="Red"
+                                VerticalAlignment="Center"/>
+                        </StackPanel>
 
-                <!--Table Selection-->
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Label Content="Table:" Width="80" VerticalAlignment="Center" />
-                    <ComboBox
-                    x:Name="TableComboBox"
-                    Width="200"
-                    Margin="5" />
-                </StackPanel>
-
-                <!-- Connect Button -->
-                <Button
-                x:Name="ConnectButton"
-                Content="Connect"
-                Width="100"
-                HorizontalAlignment="Center"
-                Margin="0,10"
-                Click="ConnectButton_Click" />
-            </StackPanel>
-
-            <!-- CRUD Buttons -->
-            <StackPanel 
-            Grid.Row="2" 
-            Grid.Column="1" 
-            Orientation="Horizontal" 
-            HorizontalAlignment="Center"
-            Margin="0,10">
-                <Button 
-                x:Name="btnCreate" 
-                Content="Create" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnCreate_Click"/>
-                <Button 
-                x:Name="btnUpdate" 
-                Content="Update" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnUpdate_Click"/>
-                <Button 
-                x:Name="btnDelete" 
-                Content="Delete" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnDelete_Click"/>
-                <Button 
-                x:Name="btnSave" 
-                Content="Save Changes" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnSave_Click"/>
-                <Button 
-                x:Name="btnCancel" 
-                Content="Cancel" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnCancel_Click"/>
-
-                <Button 
-                x:Name="btnRefresh" 
-                Content="Refresh" 
-                Width="100" 
-                Margin="5,0"
-                Click="btnRefresh_Click"/>
-            </StackPanel>
-            <!-- Filter Controls -->
-            <TextBlock
-            x:Name="FilterTextBlock"
-            Grid.Row="3"
-            Grid.Column="1"
-            Text="Select Columns to Filter:"
-            FontWeight="Bold"
-            Margin="15,0,0,0"
-            />
-            <StackPanel 
-            x:Name="FilterPanel"
-            Grid.Row="3" 
-            Grid.Column="1" 
-            Orientation="Horizontal"
-            Margin="10">
-                <!-- Filter Row 1 -->
-                <StackPanel 
-                Orientation="Vertical" 
-                Margin="5">
-                    <ComboBox 
-                    x:Name="cmbColumn1" 
-                    Width="150" 
-                    HorizontalAlignment="Left"
-                    Margin="0, 5"
-                    IsEnabled="False"
-                    />
-                    <TextBox 
-                    x:Name="txtFilter1" 
-                    Width="250" 
-                    IsEnabled="False"
-                    TextChanged="ApplyFilter"
-                    />
-                </StackPanel>
-
-                <!-- Filter Row 2 -->
-                <StackPanel Orientation="Vertical" Margin="5">
-                    <ComboBox 
-                    x:Name="cmbColumn2" 
-                    Width="150" 
-                    HorizontalAlignment="Left"
-                    Margin="0, 5"
-                    IsEnabled="False"
-                    />
-                    <TextBox 
-                    x:Name="txtFilter2" 
-                    Width="250" 
-                    IsEnabled="False"
-                    TextChanged="ApplyFilter"
-                    />
-                </StackPanel>
-
-                <!-- Filter Row 3 -->
-                <StackPanel Orientation="Vertical" Margin="5">
-                    <ComboBox 
-                    x:Name="cmbColumn3" 
-                    Width="150" 
-                    HorizontalAlignment="Left"
-                    Margin="0, 5"
-                    IsEnabled="False"
-                    />
-                    <TextBox 
-                    x:Name="txtFilter3" 
-                    Width="250" 
-                    IsEnabled="False"
-                    TextChanged="ApplyFilter"
-                    />
-                </StackPanel>
-
-                <!-- Clear Filter Button -->
-                <Button 
-                x:Name="btnClearFilter"
-                Content="Clear Filter" 
-                Height="30"
-                Width="150"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Left"
-                Margin="5"
-                Click="btnClearFilter_Click"/>
-            </StackPanel>
-            <StackPanel 
-                Grid.Row="4" 
-                Grid.Column="2"
-                Orientation="Horizontal"
-                VerticalAlignment="Top"
-                >
-                <Button 
-                    Content="&#11164;"
-                    Click="btnPreviousPage_Click"
-                    Margin="2,0"
-                    />
-                <Button 
-                    Content="&#x2B9E;"
-                    Margin="2,0"
-                    Click="btnNextPage_Click"
-                    />
-                    <TextBlock Text=" "/>
-            </StackPanel>
-            <!-- DataGrid to display table contents -->
-            <DataGrid
-            Grid.Column="1"
-            Grid.Row="4" 
-            x:Name="DataGridResults" 
-            Margin="10"
-            AutoGenerateColumns="True"
-            CanUserAddRows="False"
-            IsReadOnly="False" />
+                        <!-- Connect/Disconnect Button -->
+                        <Button
+                            Grid.Column="1"
+                            x:Name="ConnectButton"
+                            Content="Connect"
+                            FontWeight="SemiBold"
+                            Height="36"
+                            Width="120"
+                            HorizontalAlignment="Right"
+                            Background="{DynamicResource MahApps.Brushes.Accent}"
+                            Foreground="White"
+                            Click="ConnectButton_Click" />
+                    </Grid>
+                </Grid>
+            </Border>
         </Grid>
     </ScrollViewer>
 </Page>

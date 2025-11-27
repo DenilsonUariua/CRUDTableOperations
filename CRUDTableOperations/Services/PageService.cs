@@ -1,10 +1,8 @@
-﻿using System.Windows.Controls;
-
-using CommunityToolkit.Mvvm.ComponentModel;
-
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CRUDTableOperations.Contracts.Services;
 using CRUDTableOperations.ViewModels;
 using CRUDTableOperations.Views;
+using System.Windows.Controls;
 
 namespace CRUDTableOperations.Services;
 
@@ -17,8 +15,7 @@ public class PageService : IPageService
     {
         _serviceProvider = serviceProvider;
         Configure<MainViewModel, MainPage>();
-        Configure<DataGridViewModel, DataGridPage>();
-        Configure<DataGrid1ViewModel, DataGrid1Page>();
+
     }
 
     public Type GetPageType(string key)

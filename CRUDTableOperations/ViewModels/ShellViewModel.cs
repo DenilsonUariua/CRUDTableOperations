@@ -1,11 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Input;
-
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
 using CRUDTableOperations.Contracts.Services;
-using CRUDTableOperations.Properties;
+using System.Windows;
+using System.Windows.Input;
 
 namespace CRUDTableOperations.ViewModels;
 
@@ -69,14 +66,4 @@ public class ShellViewModel : ObservableObject
 
     private void OnMenuViewsMain()
         => _navigationService.NavigateTo(typeof(MainViewModel).FullName, null, true);
-
-    public ICommand MenuViewsDataGridCommand => _menuViewsDataGridCommand ?? (_menuViewsDataGridCommand = new RelayCommand(OnMenuViewsDataGrid));
-
-    private void OnMenuViewsDataGrid()
-        => _navigationService.NavigateTo(typeof(DataGridViewModel).FullName, null, true);
-
-    public ICommand MenuViewsDataGrid1Command => _menuViewsDataGrid1Command ?? (_menuViewsDataGrid1Command = new RelayCommand(OnMenuViewsDataGrid1));
-
-    private void OnMenuViewsDataGrid1()
-        => _navigationService.NavigateTo(typeof(DataGrid1ViewModel).FullName, null, true);
 }

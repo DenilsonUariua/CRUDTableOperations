@@ -61,7 +61,7 @@ namespace CRUDTableOperations.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TDW_TABLE_MANAGER.
+        ///   Looks up a localized string similar to TDW TABLE OPERATOR.
         /// </summary>
         public static string AppDisplayName {
             get {

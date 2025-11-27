@@ -1,9 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Threading;
-
-using CRUDTableOperations.Contracts.Services;
+﻿using CRUDTableOperations.Contracts.Services;
 using CRUDTableOperations.Contracts.Views;
 using CRUDTableOperations.Core.Contracts.Services;
 using CRUDTableOperations.Core.Services;
@@ -11,10 +6,13 @@ using CRUDTableOperations.Models;
 using CRUDTableOperations.Services;
 using CRUDTableOperations.ViewModels;
 using CRUDTableOperations.Views;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace CRUDTableOperations;
 
@@ -67,21 +65,15 @@ public partial class App : Application
         services.AddSingleton<ISampleDataService, SampleDataService>();
         services.AddSingleton<IPageService, PageService>();
         services.AddSingleton<INavigationService, NavigationService>();
-		services.AddSingleton<SQLDataService>();
+        services.AddSingleton<SQLDataService>();
         services.AddSingleton<EmployeeSQLDataService>();
 
-		// Views and ViewModels
-		services.AddTransient<IShellWindow, ShellWindow>();
+        // Views and ViewModels
+        services.AddTransient<IShellWindow, ShellWindow>();
         services.AddTransient<ShellViewModel>();
 
         services.AddTransient<MainViewModel>();
         services.AddTransient<MainPage>();
-
-        services.AddTransient<DataGridViewModel>();
-        services.AddTransient<DataGridPage>();
-
-        services.AddTransient<DataGrid1ViewModel>();
-        services.AddTransient<DataGrid1Page>();
 
         services.AddTransient<IShellDialogWindow, ShellDialogWindow>();
         services.AddTransient<ShellDialogViewModel>();
